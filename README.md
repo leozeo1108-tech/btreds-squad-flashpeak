@@ -870,3 +870,12 @@ session.user
 
 </body>
 </html>
+async function loginGoogle(){
+ const r=await db.auth.signInWithOAuth({
+   provider:"google",
+   options:{
+     redirectTo:window.location.origin+window.location.pathname
+   }
+ });
+ if(r.error) err.textContent=r.error.message;
+}
