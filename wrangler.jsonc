@@ -1,0 +1,8 @@
+{
+  "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
+  "name": "btreds-squad-flashpeak",
+  "compatibility_date": "2026-09-12",
+  "assets": {
+    "directory": "."
+  }
+}
