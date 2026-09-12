@@ -18,3 +18,4 @@ Allowed app URL:
 - No Google Client Secret is stored in this project.
 - The Supabase publishable key is intended for browser use with RLS enabled.
 - Never add a Supabase service_role key or Google Client Secret to `public/`.
+Cloudflare Google OAuth deployment
