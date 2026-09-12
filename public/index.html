@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BTReDS SQUAD FLASH PEAK</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #090909;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: #151515;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 30px 22px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    }
+
+    .logo {
+      font-size: 42px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .subtitle {
+      color: #aaa;
+      margin: 8px 0 25px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .google {
+      background: white;
+      color: #222;
+    }
+
+    .logout {
+      background: #333;
+      color: white;
+    }
+
+    #status {
+      margin-top: 18px;
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .user {
+      margin-top: 20px;
+      padding: 15px;
+      background: #202020;
+      border-radius: 12px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <div class="logo">⚡</div>
+
+    <h1>BTReDS SQUAD FLASH PEAK</h1>
+
+    <div class="subtitle">
+      Login / Daftar Akun
+    </div>
+
+    <button class="google" onclick="loginGoogle()">
+      🔵 Lanjutkan dengan Google
+    </button>
+
+    <button class="logout" onclick="logout()" id="logoutBtn" style="display:none">
+      Keluar
+    </button>
+
+    <div id="status">
+      Silakan login menggunakan akun Google.
+    </div>
+
+    <div class="user" id="userBox"></div>
+
+  </div>
+
+<script>
+
+const SUPABASE_URL =
+  "https://oztmylktxjymmpkzroim.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_vaaNcr7zd-2M1ebHAN_4oQ_pAZzHVYb";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+async function loginGoogle() {
+
+  const status = document.getElementById("status");
+
+  status.textContent = "Menghubungkan ke Google...";
+
+  const { error } = await db.auth.signInWithOAuth({
+
+    provider: "google",
+
+    options: {
+      redirectTo:
+        window.location.origin +
+        window.location.pathname
+    }
+
+  });
+
+  if (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "Login Google gagal: " +
+      error.message;
+
+  }
+
+}
+
+
+async function logout() {
+
+  await db.auth.signOut();
+
+  showLoggedOut();
+
+}
+
+
+async function checkUser() {
+
+  const { data, error } =
+    await db.auth.getUser();
+
+  if (error || !data.user) {
+
+    showLoggedOut();
+
+    return;
+
+  }
+
+  showLoggedIn(data.user);
+
+}
+
+
+function showLoggedIn(user) {
+
+  document.querySelector(".google")
+    .style.display = "none";
+
+  document.getElementById("logoutBtn")
+    .style.display = "block";
+
+  const box =
+    document.getElementById("userBox");
+
+  box.style.display = "block";
+
+  const name =
+    user.user_metadata?.full_name ||
+    user.user_metadata?.name ||
+    user.email;
+
+  box.innerHTML =
+    "👤 <strong>" +
+    escapeHtml(name) +
+    "</strong><br><br>" +
+    "📧 " +
+    escapeHtml(user.email || "");
+
+  document.getElementById("status")
+    .textContent =
+    "Login berhasil! Selamat datang di BTReDS SQUAD.";
+
+}
+
+
+function showLoggedOut() {
+
+  document.querySelector(".google")
+    .style.display = "block";
+
+  document.getElementById("logoutBtn")
+    .style.display = "none";
+
+  document.getElementById("userBox")
+    .style.display = "none";
+
+  document.getElementById("status")
+    .textContent =
+    "Silakan login menggunakan akun Google.";
+
+}
+
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = text || "";
+
+  return div.innerHTML;
+
+}
+
+
+db.auth.onAuthStateChange(
+  (event, session) => {
+
+    if (session?.user) {
+
+      showLoggedIn(session.user);
+
+    } else {
+
+      showLoggedOut();
+
+    }
+
+  }
+);
+
+
+checkUser();
+
+</script>
+
+</body>
+</html>
